@@ -5,15 +5,14 @@ import { uniqueValuesInDataSet } from './util';
 export default class Grid extends Component {
 	static propTypes = {
 		showGrid: PropTypes.bool,
-		data: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.array)).isRequired,
+		data: PropTypes.array.isRequired,
 		verticalGridStep: PropTypes.number.isRequired,
-		horizontalGridStep: PropTypes.number,
 		gridLineWidth: PropTypes.number,
 		gridColor: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
 		hideHorizontalGridLines: PropTypes.bool,
 		hideVerticalGridLines: PropTypes.bool,
-		height: PropTypes.number,
-		width: PropTypes.number,
+		height: PropTypes.number.isRequired,
+		width: PropTypes.number.isRequired,
 		type: PropTypes.oneOf(['line', 'bar', 'pie']).isRequired,
 	};
 	static defaultProps = {
@@ -24,14 +23,12 @@ export default class Grid extends Component {
 		if (!this.props.showGrid) return null;
 		const horizontalRange = [];
 		const verticalRange = [];
-		const data = this.props.data || [[]];
-		const unique = uniqueValuesInDataSet(data[0]);
+		const data = this.props.data || [];
+		const unique = uniqueValuesInDataSet(data);
 		const horizontalSteps = (unique.length < this.props.verticalGridStep) ? unique.length : this.props.verticalGridStep;
-		let stepsBetweenVerticalLines = this.props.horizontalGridStep ? Math.round(data.length / this.props.horizontalGridStep) : 1;
-		if (stepsBetweenVerticalLines < 1) stepsBetweenVerticalLines = 1;
 
 		for (let i = horizontalSteps; i > 0; i--) horizontalRange.push(i);
-		for (let i = data.length - 1; i > 0; i -= stepsBetweenVerticalLines) verticalRange.push(i);
+		for (let i = data.length - 1; i > 0; i--) verticalRange.push(i);
 
 		const containerStyle = { width: this.props.width, height: this.props.height, position: 'absolute', left: 0 };
 
@@ -49,7 +46,7 @@ export default class Grid extends Component {
 
 		const verticalGridStyle = {
 			height: this.props.height + 1,
-			width: (this.props.width / (data.length - 1)) * stepsBetweenVerticalLines,
+			width: this.props.width / data.length,
 			borderRightColor: this.props.gridColor,
 			borderRightWidth: intendedLineWidth,
 		};
