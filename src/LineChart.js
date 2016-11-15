@@ -1,14 +1,17 @@
 /* @flow */
 import React, { Component } from 'react';
 import { Animated, ART, View, Platform } from 'react-native';
-const { Surface, Shape, Path } = ART;
+const { Surface, Shape, Path, Text, Group } = ART;
 import * as C from './constants';
 import Circle from './Circle';
 const AnimatedShape = Animated.createAnimatedComponent(Shape);
 import Grid from './Grid';
 
-const makeDataPoint = (x : number, y : number, data : any) => {
-	return { x, y, radius: data.dataPointRadius, fill: data.dataPointFillColor, stroke: data.dataPointColor };
+const makeDataPoint = (x : number, y : number, data : any, index : number) => {
+	const label = (data.data[index][2]) ? data.data[index][2] : '' 
+	return { x, y, radius: data.dataPointRadius, fill: data.dataPointFillColor, 
+		stroke: data.dataPointColor, label: label, fontLabel: data.fontLabel 
+	};
 };
 
 const calculateDivisor = (minBound : number, maxBound : number) : number => {
@@ -64,7 +67,7 @@ export default class LineChart extends Component<void, any, any> {
 		const path = new Path().moveTo(0, height);
 		const fillPath = new Path().moveTo(0, containerHeight).lineTo(0, height);
 
-		dataPoints.push(makeDataPoint(0, height, this.props));
+		dataPoints.push(makeDataPoint(0, height, this.props, 0));
 
 		data.slice(1).forEach(([_, dataPoint], i) => {
 			let _height = (minBound * scale) + (containerHeight - (dataPoint * scale));
@@ -76,7 +79,7 @@ export default class LineChart extends Component<void, any, any> {
 
 			path.lineTo(x, y);
 			fillPath.lineTo(x, y);
-			dataPoints.push(makeDataPoint(x, y, this.props));
+			dataPoints.push(makeDataPoint(x, y, this.props, i+1));
 		});
 		fillPath.lineTo(dataPoints[dataPoints.length - 1].x, containerHeight);
 		if (this.props.fillColor) {
@@ -98,7 +101,14 @@ export default class LineChart extends Component<void, any, any> {
 					if (!this.props.showDataPoint) return null;
 					return (
 						<Surface width={containerWidth} height={containerHeight}>
-							{dataPoints.map((d, i) => <Circle key={i} {...d} />)}
+							{dataPoints.map((d, i) => {
+								if(i !==0) return (
+									<Group key={i}>										
+										<Circle  {...d} />
+										<Text  x={d.x - 10} y={d.y - 20}  fill={(d.fill) ? d.fill : '#000000'}  font={(d.fontLabel) ? d.fontLabel : 'bold 10px "Arial"'}>{d.label}</Text>
+									</Group>
+								)
+							})}
 						</Surface>
 					);
 				})()}
