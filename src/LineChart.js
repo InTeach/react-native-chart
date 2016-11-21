@@ -105,7 +105,7 @@ export default class LineChart extends Component<void, any, any> {
 								if(i !==0) return (
 									<Group key={i}>										
 										<Circle  {...d} />
-										<Text  x={d.x - 10} y={d.y - 20}  fill={(d.fill) ? d.fill : '#000000'}  font={(d.fontLabel) ? d.fontLabel : 'bold 10px "Arial"'}>{d.label}</Text>
+										<Text  x={d.x + 7} y={d.y - 10}  fill={'rgba(255,255,255,0.7)'} font={(d.fontLabel) ? d.fontLabel : 'bold 10px "Arial"'}>{d.label}</Text>
 									</Group>
 								)
 							})}
