@@ -10,7 +10,7 @@ import XAxis from './xAxis';
 import * as C from './constants';
 
 const styles = StyleSheet.create({
-	default: { flex: 1 },
+	default: { },
 });
 
 const getRoundNumber = (value, gridStep) => {
@@ -79,13 +79,11 @@ export default class Chart extends Component<void, any, any> {
 		const data = this.props.data || [];
 		data.forEach(XYPair => {
 			const number = XYPair[1];
-			if (number < min) min = number;
-			if (number > max) max = number;
+			if (Number(number) < Number(min)) min = Number(number);
+			if (Number(number) > Number(max)) max = Number(number);
 		});
-
 		min = Math.round(min)-(max-min)*0.1;
-		max = Math.round(max)+(max-min)*0.1;
-
+		max = Math.round(max)+(max-min)*0.4;
 		// Exit if we want tight bounds
 		if (this.props.tightBounds) {
 			return this.setState({ bounds: { min, max } });
@@ -130,10 +128,11 @@ export default class Chart extends Component<void, any, any> {
 		return this.setState({ bounds: { max, min } });
 	}
 
-	_onContainerLayout = (e : Object) => this.setState({
+	_onContainerLayout = (e : Object) => {
+		this.setState({	
 		containerHeight: Math.ceil(e.nativeEvent.layout.height) + 1,
 		containerWidth: Math.ceil(e.nativeEvent.layout.width),
-	});
+	})};
 
 	_minVerticalBound() : number {
 		if (this.props.tightBounds) return this.state.bounds.min;
